@@ -1,0 +1,22 @@
+[build]
+target-dir = "target"
+
+[target.wasm32-unknown-unknown]
+# every target feature in the WebAssembly baseline for current engines.
+#
+#   +simd128             128-bit SIMD.
+#   +bulk-memory         `memory.copy` and `memory.fill`.
+#   +nontrapping-fptoint Saturating float to int conversions.
+#   +sign-ext            Sign-extension ops.
+#   +reference-types     Cheaper JS to wasm crossing under wasm-bindgen.
+#   +multivalue          Multi-register returns.
+#
+# whatever is turned on here has to be turned on for wasm-opt as well, or the
+# optimiser either refuses the module or lowers what it does not know about.
+# scripts/build-wasm.mjs passes the matching --enable flags.
+#
+# +atomics and +threads are left off. they need SharedArrayBuffer, and the
+# decoder has no use for threads.
+rustflags = [
+    "-C", "target-feature=+simd128,+bulk-memory,+nontrapping-fptoint,+sign-ext,+reference-types,+multivalue",
+]

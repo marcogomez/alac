@@ -1,0 +1,6 @@
+# every text file is checked out with lf line endings on every platform. the
+# build writes src/generated with lf and ci compares it against the checkout,
+# so a crlf checkout on windows would read as a change in every generated file
+* text=auto eol=lf
+
+*.m4a binary

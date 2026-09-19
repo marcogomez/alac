@@ -1,0 +1,8 @@
+# the compiler the module is built with, here and in ci, so the module a
+# release publishes is built the way the committed one was. bumping it means
+# rebuilding the module and committing the result together with this file
+[toolchain]
+channel = "1.96.0"
+targets = ["wasm32-unknown-unknown"]
+components = ["rustfmt", "clippy"]
+profile = "minimal"
