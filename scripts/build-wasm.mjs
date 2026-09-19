@@ -51,14 +51,14 @@ const FEATURES = [
 /** what the module has to export once the bindings are written */
 const WANTED = ["memory", "open", "alactrack_decode", "alactrack_total_samples", "__wbindgen_malloc"];
 
-/** every file under a directory, sorted by path */
-function filesUnder(directory) {
+/** every rust source under a directory, sorted by path */
+function sourcesUnder(directory) {
   const found = [];
   for (const entry of readdirSync(directory, { withFileTypes: true })) {
     const path = join(directory, entry.name);
     if (entry.isDirectory()) {
-      found.push(...filesUnder(path));
-    } else {
+      found.push(...sourcesUnder(path));
+    } else if (entry.name.endsWith(".rs")) {
       found.push(path);
     }
   }
@@ -66,26 +66,33 @@ function filesUnder(directory) {
 }
 
 /**
- * the files the module is built from. the crate's sources and manifests, its
- * lockfile with the pinned wasm-bindgen crate, the target features, the
- * toolchain, the binaryen version, and this script
+ * the files the module is built from, and nothing else. the crate's sources
+ * and manifest, its lockfile with the pinned wasm-bindgen crate, the target
+ * features, the toolchain, and this script. package.json is not among them,
+ * since a version bump or a changed field there does not change the module
  */
 function inputs() {
   return [
-    ...filesUnder(join(crate, "src")),
+    ...sourcesUnder(join(crate, "src")),
     join(crate, "Cargo.toml"),
     join(crate, "Cargo.lock"),
     join(crate, ".cargo", "config.toml"),
     join(root, "rust-toolchain.toml"),
-    join(root, "package.json"),
     fileURLToPath(import.meta.url)
   ];
 }
 
+/** the binaryen version package.json pins, which decides what wasm-opt does */
+function binaryenVersion() {
+  const manifest = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
+  return manifest.devDependencies.binaryen;
+}
+
 /**
  * one hash over every input, each keyed by its path relative to the root so
- * the hash is the same wherever the checkout is. line endings are folded to
- * lf so a checkout that turned them into crlf hashes the same
+ * the hash is the same wherever the checkout is, plus the binaryen version.
+ * line endings are folded to lf so a checkout that turned them into crlf
+ * hashes the same
  */
 function sourceHash() {
   const hash = createHash("sha256");
@@ -95,6 +102,7 @@ function sourceHash() {
     hash.update(readFileSync(path, "utf8").split("\r\n").join("\n"));
     hash.update("\0");
   }
+  hash.update(`binaryen ${binaryenVersion()}`);
   return hash.digest("hex");
 }
 

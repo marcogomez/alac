@@ -5,7 +5,7 @@
  * `pnpm build-wasm` instead.
  *
  * 32903 bytes, built with simd, bulk-memory, nontrapping-float-to-int, sign-ext, reference-types, multivalue.
- * built from 4d832d739acaccadb250ef5ba3791b995e2404a6887fe3fb9dc5e2b0050e17b0
+ * built from 59c20e6cf18c32cbe216a97a2406a35fb0b2f998d814b61de3b1257c6deafe43
  */
 
 /** the decoder module, as base64 */
