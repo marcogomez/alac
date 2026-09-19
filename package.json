@@ -1,6 +1,6 @@
 {
   "name": "@mgz-dev/alac",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "description": "Apple Lossless (ALAC) decoder in pure Rust, compiled to WebAssembly.",
   "license": "MIT",
